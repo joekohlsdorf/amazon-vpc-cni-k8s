@@ -11,6 +11,10 @@ spec:
       k8s-app: cni-metrics-helper
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         k8s-app: cni-metrics-helper
     spec:
@@ -23,6 +27,20 @@ spec:
 {{- if .Values.resources }}
         resources: {{ toYaml .Values.resources | nindent 10 }}
 {{- end }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
         name: cni-metrics-helper
         image: "{{- if .Values.image.override }}{{- .Values.image.override }}{{- else }}{{- .Values.image.account }}.dkr.ecr.{{- .Values.image.region }}.{{- .Values.image.domain }}/cni-metrics-helper:{{- .Values.image.tag }}{{- end}}"
-      serviceAccountName: {{ template "cni-metrics-helper.serviceAccountName" . }} 
+      serviceAccountName: {{ template "cni-metrics-helper.serviceAccountName" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
